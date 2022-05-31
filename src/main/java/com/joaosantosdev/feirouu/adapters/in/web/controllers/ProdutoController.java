@@ -2,8 +2,8 @@ package com.joaosantosdev.feirouu.adapters.in.web.controllers;
 
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.ProdutoDTO;
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.ProdutoListagemDTO;
-import com.joaosantosdev.feirouu.application.domains.enums.Status;
 import com.joaosantosdev.feirouu.application.domains.filtros.ProdutoFiltro;
+import com.joaosantosdev.feirouu.application.domains.models.Loja;
 import com.joaosantosdev.feirouu.application.domains.models.Produto;
 import com.joaosantosdev.feirouu.application.domains.models.Usuario;
 import com.joaosantosdev.feirouu.application.domains.ports.in.LojaServicePort;
@@ -15,11 +15,10 @@ import com.joaosantosdev.feirouu.commons.mappers.ProdutoMapper;
 import com.joaosantosdev.feirouu.commons.utils.UsuarioUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,13 +38,12 @@ public class ProdutoController {
     }
 
     @PostMapping("/{lojaId}/produtos")
-    public ResponseEntity<Void> cadastrarProduto(@PathVariable Long lojaId, @RequestBody ProdutoDTO produtoDTO) {
+    public ResponseEntity<ProdutoDTO> cadastrarProduto(@PathVariable Long lojaId, @RequestBody ProdutoDTO produtoDTO) {
         Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
 
-        Long produtoId = this.produtoServicePort.cadastrar(ProdutoMapper.map(usuario, lojaId, produtoDTO));
+        Produto produto = this.produtoServicePort.cadastrar(ProdutoMapper.map(usuario, lojaId, produtoDTO));
 
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(produtoId).toUri();
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.ok().body(ProdutoMapper.map(produto));
     }
 
     @PutMapping("/{lojaId}/produtos/{id}")
@@ -68,12 +66,12 @@ public class ProdutoController {
 
     @GetMapping("/{lojaId}/produtos")
     public ResponseEntity<Pagina<ProdutoDTO>> buscarPaginado(@RequestParam(required = false, defaultValue = "0") Integer pagina,
-                                                                 @RequestParam(required = false, defaultValue = "24") Integer porPagina,
-                                                                 @RequestParam(required = false, defaultValue = "nome") String ordenarPor,
-                                                                 @RequestParam(required = false, defaultValue = "ASC") String direcao,
-                                                             @RequestParam(required = false, defaultValue = "") String textoBusca,
-                                                             @RequestParam(required = false) String status,
-                                                             @PathVariable Long lojaId) {
+                                                                         @RequestParam(required = false, defaultValue = "24") Integer porPagina,
+                                                                         @RequestParam(required = false, defaultValue = "nome") String ordenarPor,
+                                                                         @RequestParam(required = false, defaultValue = "ASC") String direcao,
+                                                                         @RequestParam(required = false, defaultValue = "") String textoBusca,
+                                                                         @RequestParam(required = false) String status,
+                                                                         @PathVariable Long lojaId) {
 
         Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
 
@@ -103,5 +101,16 @@ public class ProdutoController {
         Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
         this.produtoServicePort.excluirProduto(produtoId, lojaId, usuario.getId());
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{lojaId}/produtos/todos")
+    public ResponseEntity<List<ProdutoDTO>> excluirProduto(@PathVariable Long lojaId) {
+        List<Produto> produtos = this.produtoServicePort.buscarPorLoja(lojaId);
+        return ResponseEntity.ok(produtos.stream().map(item -> {
+            ProdutoDTO dto = ProdutoMapper.map(item);
+            dto.setValorCompra(null);
+            return dto;
+        }).collect(Collectors.toList()));
     }
 }

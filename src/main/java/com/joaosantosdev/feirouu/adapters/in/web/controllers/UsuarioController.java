@@ -1,5 +1,6 @@
 package com.joaosantosdev.feirouu.adapters.in.web.controllers;
 
+import com.joaosantosdev.feirouu.adapters.in.web.dtos.RedefinicaoSenhaDTO;
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.UsuarioFormDTO;
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.UsuarioInfoDTO;
 import com.joaosantosdev.feirouu.application.domains.models.CodigoVerificacao;
@@ -9,15 +10,12 @@ import com.joaosantosdev.feirouu.application.domains.ports.in.LojaServicePort;
 import com.joaosantosdev.feirouu.commons.mappers.UsuarioMapper;
 import com.joaosantosdev.feirouu.application.domains.ports.in.UsuarioServicePort;
 import com.joaosantosdev.feirouu.commons.utils.UsuarioUtil;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -39,7 +37,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> registrar(@RequestBody UsuarioFormDTO usuarioFormDTO){
+    public ResponseEntity<Void> registrar(@RequestBody UsuarioFormDTO usuarioFormDTO) {
         usuarioFormDTO.setSenha(this.bCryptPasswordEncoder.encode(usuarioFormDTO.getSenha()));
         Long id = usuarioServicePort.salvar(UsuarioMapper.map(usuarioFormDTO), new CodigoVerificacao(usuarioFormDTO.getEmail(),
                 usuarioFormDTO.getCodigoVerificacao().toUpperCase()));
@@ -48,18 +46,40 @@ public class UsuarioController {
     }
 
 
-
     @GetMapping("/autenticado")
-    public ResponseEntity<UsuarioInfoDTO> obterUsuarioAutenticado(){
-        Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
+    public ResponseEntity<UsuarioInfoDTO> obterUsuarioAutenticado() {
+        Long usuarioId = this.usuarioUtil.obterUsuarioLogado().getId();
+        Usuario usuario = this.usuarioServicePort.obterPorId(usuarioId);
         Loja loja = this.lojaServicePort.buscarPorUsuarioId(usuario.getId());
+        return ResponseEntity.ok(UsuarioMapper.mapUsuarioInfo(usuario, loja));
+    }
 
-        return ResponseEntity.ok(new UsuarioInfoDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                loja != null ? loja.getId() : null
-        ));
+    @PutMapping("/autenticado")
+    public ResponseEntity<Void> atualizarUsuarioAutenticado(@RequestBody UsuarioFormDTO usuarioFormDTO) {
+        Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
+        CodigoVerificacao codigoVerificacao = null;
+
+        if (usuarioFormDTO.getCodigoVerificacao() != null) {
+            codigoVerificacao = new CodigoVerificacao(usuarioFormDTO.getEmail(), usuarioFormDTO.getCodigoVerificacao().toUpperCase());
+        }
+
+        usuarioServicePort.atualizar(UsuarioMapper.map(usuario.getId(), usuarioFormDTO), codigoVerificacao);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<Void> redefinirSenha(@RequestBody RedefinicaoSenhaDTO redefinicaoSenhaDTO) {
+        redefinicaoSenhaDTO.setSenha(this.bCryptPasswordEncoder.encode(redefinicaoSenhaDTO.getSenha()));
+        CodigoVerificacao codigoVerificacao = null;
+
+        if (redefinicaoSenhaDTO.getCodigoVerificacao() != null) {
+            codigoVerificacao = new CodigoVerificacao(redefinicaoSenhaDTO.getEmail(),
+                    redefinicaoSenhaDTO.getCodigoVerificacao().toUpperCase());
+        }
+
+        usuarioServicePort.redefinirSenha(UsuarioMapper.map(redefinicaoSenhaDTO), codigoVerificacao);
+        return ResponseEntity.noContent().build();
     }
 
 }

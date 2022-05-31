@@ -4,8 +4,10 @@ import com.joaosantosdev.feirouu.application.domains.models.Loja;
 import com.joaosantosdev.feirouu.application.domains.ports.in.LojaServicePort;
 import com.joaosantosdev.feirouu.application.domains.ports.out.LojaPersistencePort;
 import com.joaosantosdev.feirouu.application.exceptions.NegocioException;
+import com.joaosantosdev.feirouu.application.utils.FiltroLoja;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
 
 public class LojaService implements LojaServicePort {
@@ -18,7 +20,7 @@ public class LojaService implements LojaServicePort {
     }
 
     @Override
-    public Long cadastrar(Loja loja) {
+    public Loja cadastrar(Loja loja) {
         return loja.cadastrar(this.lojaPersistencePort);
     }
 
@@ -42,6 +44,11 @@ public class LojaService implements LojaServicePort {
     @Override
     public Loja buscarPorUsuarioId(Long id) {
         return this.lojaPersistencePort.buscarLojaPorUsuarioId(id);
+    }
+
+    @Override
+    public List<Loja> buscarLojas(FiltroLoja filtros) {
+        return this.lojaPersistencePort.buscarLojas(filtros);
     }
 
 }

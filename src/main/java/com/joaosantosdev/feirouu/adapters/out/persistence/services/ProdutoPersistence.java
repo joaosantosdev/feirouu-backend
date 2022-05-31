@@ -8,6 +8,7 @@ import com.joaosantosdev.feirouu.adapters.out.persistence.repositories.ProdutoRe
 import com.joaosantosdev.feirouu.adapters.out.persistence.repositories.UsuarioRepository;
 import com.joaosantosdev.feirouu.application.domains.enums.Status;
 import com.joaosantosdev.feirouu.application.domains.filtros.ProdutoFiltro;
+import com.joaosantosdev.feirouu.application.domains.models.Loja;
 import com.joaosantosdev.feirouu.application.domains.models.Produto;
 import com.joaosantosdev.feirouu.application.domains.ports.out.ProdutoPersistencePort;
 import com.joaosantosdev.feirouu.application.utils.Pagina;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,11 +42,11 @@ public class ProdutoPersistence implements ProdutoPersistencePort {
 
     @Override
     @Transactional
-    public Long cadastrar(Produto produto) {
+    public Produto cadastrar(Produto produto) {
         ProdutoEntity produtoEntity = ProdutoEntityMapper.map(produto);
-        this.produtoRepository.save(produtoEntity);
+        produtoEntity = this.produtoRepository.save(produtoEntity);
         this.produtoChaveEtiquetaRepository.saveAll(produtoEntity.getChavesEtiquetas());
-        return produtoEntity.getId();
+        return ProdutoMapper.map(produtoEntity);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class ProdutoPersistence implements ProdutoPersistencePort {
     @Override
     public Optional<Produto> buscar(Long id, Long lojaId) {
         ProdutoEntity produtoEntity = this.produtoRepository.findByIdAndLojaId(id, lojaId);
-        return Optional.of(ProdutoMapper.map(produtoEntity));
+        return Optional.ofNullable(ProdutoMapper.map(produtoEntity));
     }
 
     @Override
@@ -89,5 +91,13 @@ public class ProdutoPersistence implements ProdutoPersistencePort {
         ProdutoEntity produtoEntity = this.produtoRepository.getById(produtoId);
         this.produtoChaveEtiquetaRepository.deleteAll(produtoEntity.getChavesEtiquetas());
         this.produtoRepository.deleteById(produtoId);
+    }
+
+    @Override
+    public List<Produto> buscarPorLoja(Long lojaId) {
+        List<ProdutoEntity> produtosEntities = this.produtoRepository.findByLojaId(lojaId);
+        return produtosEntities.stream()
+                .map(ProdutoMapper::map)
+                .collect(Collectors.toList());
     }
 }

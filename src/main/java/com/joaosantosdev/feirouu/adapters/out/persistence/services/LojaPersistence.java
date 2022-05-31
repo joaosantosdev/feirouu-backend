@@ -9,10 +9,15 @@ import com.joaosantosdev.feirouu.adapters.out.persistence.repositories.EnderecoR
 import com.joaosantosdev.feirouu.adapters.out.persistence.repositories.LojaRepository;
 import com.joaosantosdev.feirouu.application.domains.models.Loja;
 import com.joaosantosdev.feirouu.application.domains.ports.out.LojaPersistencePort;
+import com.joaosantosdev.feirouu.application.utils.FiltroLoja;
+import com.joaosantosdev.feirouu.commons.mappers.LojaMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -36,13 +41,13 @@ public class LojaPersistence implements LojaPersistencePort {
 
     @Override
     @Transactional
-    public Long cadastrar(Loja loja) {
+    public Loja cadastrar(Loja loja) {
         LojaEntity lojaEntity = LojaEntityMapper.map(loja);
         Optional<CidadeEntity> cidade = this.cidadeRepository.findById(lojaEntity.getEndereco().getCidade().getId());
         lojaEntity.getEndereco().setCidade(cidade.get());
         this.enderecoRepository.save(lojaEntity.getEndereco());
         this.lojaRepository.save(lojaEntity);
-        return lojaEntity.getId();
+        return LojaEntityMapper.map(lojaEntity);
     }
 
     @Override
@@ -50,7 +55,7 @@ public class LojaPersistence implements LojaPersistencePort {
         Optional<LojaEntity> lojaEntityOptional = this.lojaRepository.findByIdAndUsuarioId(id, usuarioId);
         Loja loja = null;
 
-        if(lojaEntityOptional.isPresent()){
+        if (lojaEntityOptional.isPresent()) {
             loja = LojaEntityMapper.map(lojaEntityOptional.get());
         }
 
@@ -64,21 +69,20 @@ public class LojaPersistence implements LojaPersistencePort {
         this.lojaRepository.save(lojaEntity);
     }
 
-    public void atualizasr(Loja loja) {
-        LojaEntity lojaCadastrada = this.lojaRepository.getById(loja.getId());
+    @Override
+    public List<Loja> buscarLojas(FiltroLoja filtros) {
+        List<LojaEntity> lojaEntities = new ArrayList<>();
 
-        lojaCadastrada.setDescricao(loja.getDescricao());
-        lojaCadastrada.setNome(loja.getNome());
-        lojaCadastrada.setEmail(loja.getEmail());
-        lojaCadastrada.setTelefone(loja.getTelefone());
+        if (filtros.getEstadoId() == null && filtros.getCidadeId() == null && filtros.getNome() == null && filtros.getBairro() == null) {
+            lojaEntities = this.lojaRepository.findAll();
+        } else {
+            lojaEntities = this.lojaRepository.obterLojasFiltros(filtros.getNome(),
+                    filtros.getCidadeId(),
+                    filtros.getEstadoId(),
+                    filtros.getBairro());
+        }
 
-        lojaCadastrada.getEndereco().setCidade(this.cidadeRepository.getById(loja.getEndereco().getCidade().getId()));
-        lojaCadastrada.getEndereco().setBairro(loja.getEndereco().getBairro());
-        lojaCadastrada.getEndereco().setCep(loja.getEndereco().getCep());
-        lojaCadastrada.getEndereco().setNumero(loja.getEndereco().getNumero());
-        lojaCadastrada.getEndereco().setComplemento(loja.getEndereco().getComplemento());
-
-        this.enderecoRepository.save(lojaCadastrada.getEndereco());
-        this.lojaRepository.save(lojaCadastrada);
+        return lojaEntities.stream().map(LojaEntityMapper::map).collect(Collectors.toList());
     }
+
 }

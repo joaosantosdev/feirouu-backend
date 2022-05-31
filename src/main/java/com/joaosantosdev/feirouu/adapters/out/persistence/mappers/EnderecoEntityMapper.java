@@ -10,12 +10,18 @@ import com.joaosantosdev.feirouu.application.domains.models.Estado;
 public class EnderecoEntityMapper {
 
     public static Estado mapEstado(EstadoEntity estadoEntity){
+        if(estadoEntity == null){
+            return null;
+        }
         return new Estado(estadoEntity.getId(),
                 estadoEntity.getNome(),
                 estadoEntity.getUf());
     }
 
     public static Cidade mapCidade(CidadeEntity cidadeEntity){
+        if(cidadeEntity == null){
+            return null;
+        }
         return new Cidade(cidadeEntity.getId(),
                 cidadeEntity.getNome(),
                 mapEstado(cidadeEntity.getEstado()));
@@ -23,6 +29,9 @@ public class EnderecoEntityMapper {
 
 
     public static Endereco map(EnderecoEntity enderecoEntity) {
+        if(enderecoEntity == null){
+            return null;
+        }
         return new Endereco(
                 enderecoEntity.getId(),
                 enderecoEntity.getNumero(),

@@ -1,9 +1,6 @@
 package com.joaosantosdev.feirouu.commons.mappers;
 
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.ListagemMovimentacaoDTO;
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.MovimentacaoDevolucaoDTO;
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.MovimentacaoEntradaDTO;
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.MovimentacaoSaidaDTO;
+import com.joaosantosdev.feirouu.adapters.in.web.dtos.*;
 import com.joaosantosdev.feirouu.application.domains.models.*;
 
 import java.util.ArrayList;
@@ -26,6 +23,16 @@ public class MovimentacaoMapper {
         return new Movimentacao(movimentacaoEntradaDTO.getQuantidade(),
                 new Produto(produtoId, new Loja(lojaId, usuario)),
                 valoresEtiquetas);
+    }
+
+
+    public static List<MovimentacaoEntradaDTO> mapEntradas(List<Movimentacao> movimentacoes) {
+        return  movimentacoes.stream().map(movimentacao -> {
+            List<MovimentacaoValorEtiquetaDTO> valoresEtiquetas = movimentacao.getValoresEtiquetas().stream().
+                    map(item -> new MovimentacaoValorEtiquetaDTO(item.getValor(), item.getProdutoChaveEtiqueta().getId()))
+                    .collect(Collectors.toList());
+            return new MovimentacaoEntradaDTO(movimentacao.getId(), movimentacao.getQuantidade(), valoresEtiquetas);
+        }).collect(Collectors.toList());
     }
 
     public static List<Movimentacao> mapSaidas(Long lojaId,

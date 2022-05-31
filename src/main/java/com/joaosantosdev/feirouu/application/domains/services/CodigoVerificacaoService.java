@@ -21,8 +21,8 @@ public class CodigoVerificacaoService implements CodigoVerificacaoServicePort {
     }
 
     @Override
-    public CodigoVerificacao enviar(String email) {
-        if(this.usuarioPersistencePort.verificarEmail(email)){
+    public CodigoVerificacao enviar(String email, Boolean redefinicao) {
+        if(this.usuarioPersistencePort.verificarEmail(email) && !redefinicao){
             throw new NegocioException(400, "Email já possui cadastro");
         }
         CodigoVerificacao codigoVerificacao = new CodigoVerificacao(email);

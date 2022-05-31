@@ -5,10 +5,11 @@ import com.joaosantosdev.feirouu.application.domains.models.Produto;
 import com.joaosantosdev.feirouu.application.utils.Pagina;
 import com.joaosantosdev.feirouu.application.utils.Paginacao;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProdutoPersistencePort {
-    Long cadastrar(Produto produto);
+    Produto cadastrar(Produto produto);
     void atualizar(Produto produto);
     Optional<Produto> buscar(Long id, Long lojaId);
     Pagina<Produto> buscarPaginado(Long lojaId, Paginacao paginacao, ProdutoFiltro produtoFiltro);
@@ -16,4 +17,6 @@ public interface ProdutoPersistencePort {
     Integer obterQuantidadeDisponivel(Long id);
 
     void excluir(Long produtoId);
+
+    List<Produto> buscarPorLoja(Long lojaId);
 }

@@ -1,12 +1,14 @@
 package com.joaosantosdev.feirouu.commons.mappers;
 
+import com.joaosantosdev.feirouu.adapters.in.web.dtos.FiltroLojaDTO;
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.LojaDTO;
 import com.joaosantosdev.feirouu.application.domains.models.Loja;
 import com.joaosantosdev.feirouu.application.domains.models.Usuario;
+import com.joaosantosdev.feirouu.application.utils.FiltroLoja;
 
 public class LojaMapper {
 
-    public static Loja map(Usuario usuario, LojaDTO lojaDTO){
+    public static Loja map(Usuario usuario, LojaDTO lojaDTO) {
         return new Loja(lojaDTO.getId(),
                 lojaDTO.getNome(),
                 lojaDTO.getDescricao(),
@@ -16,7 +18,7 @@ public class LojaMapper {
                 usuario);
     }
 
-    public static Loja map(Usuario usuario, Long lojaId){
+    public static Loja map(Usuario usuario, Long lojaId) {
         return new Loja(lojaId, usuario);
     }
 
@@ -31,4 +33,10 @@ public class LojaMapper {
         );
     }
 
+    public static FiltroLoja mapFiltro(FiltroLojaDTO filtroLojaDTO) {
+        return new FiltroLoja(filtroLojaDTO.getNome(),
+                filtroLojaDTO.getCidadeId(),
+                filtroLojaDTO.getEstadoId(),
+                filtroLojaDTO.getBairro());
+    }
 }

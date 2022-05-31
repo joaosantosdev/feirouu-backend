@@ -1,9 +1,6 @@
 package com.joaosantosdev.feirouu.adapters.in.web.controllers;
 
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.ListaDevolucaoDTO;
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.ListaSaidaDTO;
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.ListagemMovimentacaoDTO;
-import com.joaosantosdev.feirouu.adapters.in.web.dtos.MovimentacaoEntradaDTO;
+import com.joaosantosdev.feirouu.adapters.in.web.dtos.*;
 import com.joaosantosdev.feirouu.application.domains.models.Cliente;
 import com.joaosantosdev.feirouu.application.domains.models.Movimentacao;
 import com.joaosantosdev.feirouu.application.domains.models.Usuario;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,13 +69,43 @@ public class MovimentacaoController {
     }
 
     @GetMapping("/lojas/{lojaId}/clientes/{cpf}/saidas")
-    public ResponseEntity<List<ListagemMovimentacaoDTO>> registrarSaidas(@PathVariable Long lojaId,
-                                                                   @PathVariable String cpf) {
+    public ResponseEntity<List<ListagemMovimentacaoDTO>> obterSaidas(@PathVariable Long lojaId,
+                                                                     @PathVariable String cpf) {
 
         Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
         List<Movimentacao> movimentacoes = this.movimentacaoServicePort.obterSaidasPorCliente(usuario.getId(), lojaId, cpf);
         List<ListagemMovimentacaoDTO> lista = movimentacoes.stream().map(MovimentacaoMapper::map).collect(Collectors.toList());
         return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/lojas/{lojaId}/produtos/{produtoId}/entradas")
+    public ResponseEntity<List<MovimentacaoEntradaDTO>> obterEntradas(@PathVariable Long lojaId,
+                                                                      @PathVariable Long produtoId) {
+
+        Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
+        List<Movimentacao> movimentacoes = this.movimentacaoServicePort.obterEntradas(usuario.getId(), lojaId, produtoId);
+
+        return ResponseEntity.ok(MovimentacaoMapper.mapEntradas(movimentacoes));
+    }
+
+    @GetMapping("/lojas/{lojaId}/produtos/{produtoId}/quantidade-disponivel-saida")
+    public ResponseEntity<Integer> obterQuantidadeDisponivelSaida(@PathVariable Long lojaId,
+                                                                  @PathVariable Long produtoId) {
+
+        Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
+        Integer quantidade = this.movimentacaoServicePort.obterQuantidadeDisponivelSaida(usuario.getId(), lojaId, produtoId);
+
+        return ResponseEntity.ok(quantidade);
+    }
+
+    @GetMapping("/lojas/{lojaId}/relatorio/vendas")
+    public ResponseEntity<List<RelatorioDTO>> relatorioVendas(@PathVariable Long lojaId, @RequestParam String dataInicial, @RequestParam String dataFinal) {
+
+        Usuario usuario = this.usuarioUtil.obterUsuarioLogado();
+        List<Movimentacao> movimentacoes = this.movimentacaoServicePort.obterRelatorioVendas(lojaId, usuario.getId(),
+                dataInicial, dataFinal);
+
+        return ResponseEntity.ok(RelatorioMapper.map(movimentacoes));
     }
 
 }

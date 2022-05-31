@@ -19,4 +19,14 @@ public class ExceptionsHandler {
         ));
     }
 
+    @ExceptionHandler(ImagemException.class)
+    public ResponseEntity<ExceptionDTO> imagemException(ImagemException imagemException){
+        return ResponseEntity.status(imagemException.getCodigoHttp()).body(new ExceptionDTO(
+                "IMAGEM",
+                imagemException.getCodigoHttp(),
+                imagemException.getMessage(),
+                System.currentTimeMillis()
+        ));
+    }
+
 }

@@ -33,7 +33,7 @@ public class CodigoVerificacao {
 
     private String gerarCodigoVerificacao(){
         Random random = new Random();
-        int ULTIMA_LETRA_ALFABETO_MAISCULO = 95;
+        int ULTIMA_LETRA_ALFABETO_MAISCULO = 90;
         int PRIMEIRA_LETRA_ALFABETO_MAISCULO = 65;
         int i = random.nextInt(ULTIMA_LETRA_ALFABETO_MAISCULO - PRIMEIRA_LETRA_ALFABETO_MAISCULO + 1) + PRIMEIRA_LETRA_ALFABETO_MAISCULO;
         StringBuilder codigo = new StringBuilder(String.valueOf((char) i));

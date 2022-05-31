@@ -7,8 +7,8 @@ import com.joaosantosdev.feirouu.application.domains.ports.in.LojaServicePort;
 import com.joaosantosdev.feirouu.application.domains.ports.in.MovimentacaoServicePort;
 import com.joaosantosdev.feirouu.application.domains.ports.in.ProdutoServicePort;
 import com.joaosantosdev.feirouu.application.domains.ports.out.MovimentacaoPersistencePort;
-import com.joaosantosdev.feirouu.application.domains.ports.out.ProdutoPersistencePort;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class MovimentacaoService implements MovimentacaoServicePort {
@@ -58,5 +58,27 @@ public class MovimentacaoService implements MovimentacaoServicePort {
         this.lojaServicePort.buscarPorIdUsuarioId(lojaId, usuarioId);
         this.produtoServicePort.buscar(produtoId, lojaId, usuarioId);
         return this.movimentacaoPersistencePort.produtoTemMovimentacoes(produtoId);
+    }
+
+    @Override
+    public List<Movimentacao> obterEntradas(Long usuarioId, Long lojaId, Long produtoId) {
+        this.lojaServicePort.buscarPorIdUsuarioId(lojaId, usuarioId);
+        this.produtoServicePort.buscar(produtoId, lojaId, usuarioId);
+
+        return this.movimentacaoPersistencePort.obterEntradasPorProduto(produtoId);
+    }
+
+    @Override
+    public Integer obterQuantidadeDisponivelSaida(Long usuarioId, Long lojaId, Long produtoId) {
+        this.lojaServicePort.buscarPorIdUsuarioId(lojaId, usuarioId);
+        this.produtoServicePort.buscar(produtoId, lojaId, usuarioId);
+        return this.movimentacaoPersistencePort.obterQuantidadeDisponivelSaidaPorProduto(produtoId);
+    }
+
+    @Override
+    public List<Movimentacao> obterRelatorioVendas(Long lojaId, Long usuarioId, String dataInicial, String dataFinal) {
+        this.lojaServicePort.buscarPorIdUsuarioId(lojaId, usuarioId);
+
+        return this.movimentacaoPersistencePort.obterRelatorioVendas(lojaId, dataInicial, dataFinal);
     }
 }

@@ -42,9 +42,10 @@ public class Movimentacao {
         this.valorDesconto = valorDesconto;
         this.produto = produto;
         this.cliente = cliente;
+        this.movimentacaoReferencia = movimentacaoReferencia;
     }
 
-    public Movimentacao(Long id, Double valorDesconto, Double valorCompra, Double valorVenda, Integer quantidade, LocalDateTime dataHora, Produto produto, Cliente cliente, TipoMovimentacao tipoMovimentacao) {
+    public Movimentacao(Long id, Double valorDesconto, Double valorCompra, Double valorVenda, Integer quantidade, LocalDateTime dataHora, Produto produto, Cliente cliente, TipoMovimentacao tipoMovimentacao, List<MovimentacaoValorEtiqueta> valoresEtiquetas) {
         this.id = id;
         this.valorDesconto = valorDesconto;
         this.valorCompra = valorCompra;
@@ -54,6 +55,7 @@ public class Movimentacao {
         this.produto = produto;
         this.cliente = cliente;
         this.tipoMovimentacao = tipoMovimentacao;
+        this.valoresEtiquetas = valoresEtiquetas;
     }
 
 
@@ -110,13 +112,13 @@ public class Movimentacao {
 
         this.produto.getChavesEtiquetas().forEach(chave -> {
             boolean mandouChave = false;
-            for(MovimentacaoValorEtiqueta valorEtiqueta : this.getValoresEtiquetas()){
-                if(valorEtiqueta.getProdutoChaveEtiqueta().equals(chave.getId())){
+            for (MovimentacaoValorEtiqueta valorEtiqueta : this.getValoresEtiquetas()) {
+                if (valorEtiqueta.getProdutoChaveEtiqueta().getId().equals(chave.getId())) {
                     mandouChave = true;
                     break;
                 }
             }
-            if(!mandouChave){
+            if (!mandouChave) {
                 throw new NegocioException(400, "As etiquetas não foram preenchidas corretamente.");
             }
         });
@@ -126,7 +128,7 @@ public class Movimentacao {
         return movimentacaoPersistencePort.registrarEntrada(this);
     }
 
-    public void preecherInformacoesSaidas(ProdutoServicePort produtoServicePort){
+    public void preecherInformacoesSaidas(ProdutoServicePort produtoServicePort) {
         this.produto = produtoServicePort.buscar(this.produto.getId(),
                 this.produto.getLoja().getId(),
                 this.produto.getLoja().getUsuario().getId());
@@ -140,9 +142,9 @@ public class Movimentacao {
         this.movimentacaoReferencia = movimentacaoReferenciaOp
                 .orElseThrow(() -> new NegocioException(400, "Movimento de referencia não encotnado"));
 
-        Integer quantidadeSaidas = movimentacaoPersistencePort.obterQuantidadeDisponivelDevelocao(this.movimentacaoReferencia.getId());
+        Integer quantidadeSaidas = movimentacaoPersistencePort.obterQuantidadeDisponivelDevolucao(this.movimentacaoReferencia.getId());
 
-        if(this.quantidade > quantidadeSaidas){
+        if (this.quantidade > quantidadeSaidas) {
             throw new NegocioException(400, "Quantidade de devolução insuficiente");
         }
 

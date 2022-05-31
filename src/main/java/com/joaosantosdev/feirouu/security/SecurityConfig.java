@@ -24,14 +24,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UsuarioDetailsService usuarioDetailsService;
 
-    private String [] PUBLIC_MATCHERS_POST = {
-      "/usuarios"
+    private String[] PUBLIC_MATCHERS_POST = {
+            "/usuarios",
+            "/usuarios/redefinir-senha"
+
     };
 
 
-    private String [] PUBLIC_MATCHERS_GET = {
-            "/codigo-verificacao/**"
+    private String[] PUBLIC_MATCHERS_GET = {
+            "/codigo-verificacao/**",
+            "/imagens/**",
+            "/lojas",
+            "/lojas/{lojaId}/produtos/todos"
+
     };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable();
@@ -46,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
         configuration.setAllowedMethods(Arrays.asList("POST", "DELETE", "GET", "PUT", "OPTIONS"));

@@ -38,7 +38,7 @@ public class LojaEntity {
     @JoinColumn(name = "endereco_id")
     private EnderecoEntity endereco;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id")
     private UsuarioEntity usuario;
 

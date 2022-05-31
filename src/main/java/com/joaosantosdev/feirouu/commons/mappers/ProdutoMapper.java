@@ -29,6 +29,10 @@ public class ProdutoMapper {
     }
 
     public static Produto map(ProdutoEntity produtoEntity) {
+        if(produtoEntity == null){
+            return null;
+        }
+
         List<ProdutoChaveEtiqueta> chavesEtiquetas = produtoEntity.getChavesEtiquetas().stream()
                 .map(item -> new ProdutoChaveEtiqueta(item.getId(), item.getNome())).collect(Collectors.toList());
         return new Produto(produtoEntity.getId(),

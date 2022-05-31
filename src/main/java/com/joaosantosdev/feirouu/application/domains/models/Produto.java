@@ -78,7 +78,7 @@ public class Produto {
         return chavesEtiquetas;
     }
 
-    public Long cadastrar(ProdutoPersistencePort produtoPersistencePort) {
+    public Produto cadastrar(ProdutoPersistencePort produtoPersistencePort) {
         return produtoPersistencePort.cadastrar(this);
     }
 

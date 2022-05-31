@@ -1,21 +1,16 @@
 server:
   port: 9999
-
 spring:
-  datasource:
-    initialization-mode: never
-    platform: postgres
-    url: jdbc:postgresql://localhost:5432/db_feirouu
-    username: postgres
-    password: postgres
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     database: POSTGRESQL
-    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        format_sql: true
         jdbc:
           lob:
             non_contextual_creation: true
@@ -24,3 +19,6 @@ spring:
 jwt:
   expiration: 1000000000
   secret: 123
+
+img:
+  tamanho: 200

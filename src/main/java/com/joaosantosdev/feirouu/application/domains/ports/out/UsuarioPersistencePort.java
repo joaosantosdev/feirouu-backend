@@ -6,4 +6,10 @@ public interface UsuarioPersistencePort {
     Long salvar(Usuario usuario);
 
     Boolean verificarEmail(String email);
+
+    Usuario obterPorId(Long id);
+
+    void atualizar(Usuario usuario);
+
+    void redefinirSenha(Usuario usuario);
 }

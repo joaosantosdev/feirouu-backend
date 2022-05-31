@@ -42,7 +42,7 @@ public class Loja {
     }
 
 
-    public Long cadastrar(LojaPersistencePort lojaPersistencePort) {
+    public Loja cadastrar(LojaPersistencePort lojaPersistencePort) {
         if(lojaPersistencePort.buscarLojaPorUsuarioId(this.usuario.getId()) != null){
             throw new NegocioException(400, "Usuário já possui loja cadastrada.");
         }

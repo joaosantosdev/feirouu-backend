@@ -1,6 +1,7 @@
 package com.joaosantosdev.feirouu.application.domains.services;
 
 import com.joaosantosdev.feirouu.application.domains.filtros.ProdutoFiltro;
+import com.joaosantosdev.feirouu.application.domains.models.Loja;
 import com.joaosantosdev.feirouu.application.domains.models.Produto;
 import com.joaosantosdev.feirouu.application.domains.ports.in.LojaServicePort;
 import com.joaosantosdev.feirouu.application.domains.ports.in.ProdutoServicePort;
@@ -10,6 +11,7 @@ import com.joaosantosdev.feirouu.application.exceptions.NegocioException;
 import com.joaosantosdev.feirouu.application.utils.Pagina;
 import com.joaosantosdev.feirouu.application.utils.Paginacao;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ProdutoService implements ProdutoServicePort {
@@ -25,7 +27,7 @@ public class ProdutoService implements ProdutoServicePort {
     }
 
     @Override
-    public Long cadastrar(Produto produto) {
+    public Produto cadastrar(Produto produto) {
         this.lojaServicePort.buscarPorIdUsuarioId(produto.getLoja().getId(),
                 produto.getLoja().getUsuario().getId());
         return produto.cadastrar(this.produtoPersistencePort);
@@ -70,6 +72,11 @@ public class ProdutoService implements ProdutoServicePort {
             throw  new NegocioException(400, "Produto possui movimentações vinculadas e não pode ser excluído.");
         }
         this.produtoPersistencePort.excluir(produtoId);
+    }
+
+    @Override
+    public List<Produto> buscarPorLoja(Long lojaId) {
+        return this.produtoPersistencePort.buscarPorLoja(lojaId);
     }
 
 }

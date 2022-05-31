@@ -1,5 +1,6 @@
 package com.joaosantosdev.feirouu.adapters.in.web.controllers;
 
+import com.joaosantosdev.feirouu.adapters.in.web.dtos.FiltroLojaDTO;
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.LojaDTO;
 import com.joaosantosdev.feirouu.adapters.in.web.dtos.LojaListagemDTO;
 import com.joaosantosdev.feirouu.application.domains.models.Loja;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lojas")
@@ -26,10 +29,9 @@ public class LojaController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> cadastrar(@RequestBody LojaDTO lojaDTO) {
-        Long id = this.lojaServicePort.cadastrar(LojaMapper.map(this.usuarioUtil.obterUsuarioLogado(), lojaDTO));
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
-        return ResponseEntity.created(uri).build();
+    public ResponseEntity<LojaDTO> cadastrar(@RequestBody LojaDTO lojaDTO) {
+        Loja loja = this.lojaServicePort.cadastrar(LojaMapper.map(this.usuarioUtil.obterUsuarioLogado(), lojaDTO));
+        return ResponseEntity.ok().body(LojaMapper.map(loja));
     }
 
     @GetMapping("/{id}")
@@ -48,5 +50,12 @@ public class LojaController {
         this.lojaServicePort.atualizar(loja);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping
+    public ResponseEntity<LojaListagemDTO> buscarLojas(FiltroLojaDTO filtroLojaDTO) {
+        List<Loja> lojas = this.lojaServicePort.buscarLojas(LojaMapper.mapFiltro(filtroLojaDTO));
+        return ResponseEntity.ok().body(new LojaListagemDTO(lojas.stream().map(LojaMapper::map).collect(Collectors.toList())));
+    }
+
 
 }

@@ -17,6 +17,8 @@ import com.joaosantosdev.feirouu.commons.mappers.MovimentacaoValorEtiquetaMapper
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -127,8 +129,13 @@ public class MovimentacaoPersistence implements MovimentacaoPersistencePort {
     }
 
     @Override
-    public Integer obterQuantidadeDisponivelDevelocao(Long id) {
+    public Integer obterQuantidadeDisponivelDevolucao(Long id) {
         return this.movimentacaoRepository.obterQuantidadeDisponivelDevolucao(id);
+    }
+
+    @Override
+    public Integer obterQuantidadeDisponivelSaidaPorProduto(Long id) {
+        return this.movimentacaoRepository.obterQuantidadeDisponivelSaida(id);
     }
 
     @Override
@@ -150,6 +157,23 @@ public class MovimentacaoPersistence implements MovimentacaoPersistencePort {
     @Override
     public Boolean produtoTemMovimentacoes(Long produtoId) {
         return this.movimentacaoRepository.produtoTemMovimentacoes(produtoId);
+    }
+
+    @Override
+    public List<Movimentacao> obterEntradasPorProduto(Long produtoId) {
+        List<MovimentacaoEnitity> movimentacaoEnitities = this.movimentacaoRepository.obterEntradasDisponiveisPorProduto(produtoId);
+        return movimentacaoEnitities.stream()
+                .map(MovimentacaoEntityMapper::map)
+                .collect(Collectors.toList()) ;
+    }
+
+    @Override
+    public List<Movimentacao> obterRelatorioVendas(Long lojaId, String dataInicial, String dataFinal) {
+
+        List<MovimentacaoEnitity> movimentacaoEnitities = this.movimentacaoRepository.obterRelatorioVendas(lojaId, dataInicial, dataFinal);
+        return movimentacaoEnitities.stream()
+                .map(MovimentacaoEntityMapper::map)
+                .collect(Collectors.toList()) ;
     }
 
 

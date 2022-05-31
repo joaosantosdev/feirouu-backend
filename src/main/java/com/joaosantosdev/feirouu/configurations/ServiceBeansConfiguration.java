@@ -26,6 +26,8 @@ public class ServiceBeansConfiguration {
     @Autowired
     private EnderecoPersistencePort enderecoPersistencePort;
 
+    @Autowired UsuarioSenhaServicePort usuarioSenhaServicePort;
+
     @Bean
     public CodigoVerificacaoServicePort codigoVerificacaoServicePort(CodigoVerificacaoPersistencePort codigoVerificacaoPersistencePort,
                                                                      EnvioCodigoVerificacaoServicePort envioCodigoVerificacaoServicePort){

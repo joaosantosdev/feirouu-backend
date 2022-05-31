@@ -17,6 +17,7 @@ public class Usuario {
         this.senha = senha;
         this.telefone = telefone;
     }
+
     public Usuario(Long id, String nome, String email, String senha, String telefone) {
         this(nome, email, senha, telefone);
         this.id = id;
@@ -27,15 +28,35 @@ public class Usuario {
         this.email = email;
     }
 
+    public Usuario(String email, String senha) {
+        this.email = email;
+        this.senha = senha;
+    }
 
     public Long cadastrar(UsuarioPersistencePort usuarioPersistencePort,
                           CodigoVerificacaoPersistencePort codigoVerificacaoPersistencePort,
-                          CodigoVerificacao codigoVerificacao){
-        if(usuarioPersistencePort.verificarEmail(this.getEmail())){
+                          CodigoVerificacao codigoVerificacao) {
+        if (usuarioPersistencePort.verificarEmail(this.getEmail())) {
             throw new NegocioException(400, "Email já possui cadastro");
         }
         codigoVerificacao.validar(codigoVerificacaoPersistencePort);
         return usuarioPersistencePort.salvar(this);
+    }
+
+
+    public void atualizar(UsuarioPersistencePort usuarioPersistencePort,
+                          CodigoVerificacaoPersistencePort codigoVerificacaoPersistencePort,
+                          CodigoVerificacao codigoVerificacao) {
+        Usuario usuario = usuarioPersistencePort.obterPorId(this.id);
+
+
+        if (!usuario.getEmail().trim().equals(this.getEmail())) {
+            if (usuarioPersistencePort.verificarEmail(this.getEmail()))
+                throw new NegocioException(400, "Email já possui cadastro");
+
+            codigoVerificacao.validar(codigoVerificacaoPersistencePort);
+        }
+        usuarioPersistencePort.atualizar(this);
     }
 
     public Long getId() {
@@ -56,5 +77,11 @@ public class Usuario {
 
     public String getTelefone() {
         return telefone;
+    }
+
+    public void redefinirSenha(UsuarioPersistencePort usuarioPersistencePort, CodigoVerificacaoPersistencePort codigoVerificacaoPersistencePort, CodigoVerificacao codigoVerificacao) {
+        codigoVerificacao.validar(codigoVerificacaoPersistencePort);
+        usuarioPersistencePort.redefinirSenha(this);
+
     }
 }

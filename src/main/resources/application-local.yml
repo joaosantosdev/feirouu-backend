@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    initialization-mode: never
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/db_feirouu
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
