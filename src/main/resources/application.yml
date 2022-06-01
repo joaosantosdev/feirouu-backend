@@ -1,6 +1,9 @@
-server:
-  port: 9999
 spring:
+  datasource:
+    platform: org.hibernate.dialect.PostgreSQLDialect
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWROD}
   servlet:
     multipart:
       max-file-size: 10MB
@@ -14,8 +17,6 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-
-
 jwt:
   expiration: 1000000000
   secret: 123

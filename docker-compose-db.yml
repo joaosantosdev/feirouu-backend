@@ -1,0 +1,13 @@
+db_feirouu:
+  image: postgres
+  container_name: db_feirouu
+  environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+    - POSTGRES_DB=db_feirouu
+  ports:
+    - 5432:5432
+  expose:
+    - 5432
+  volumes:
+    - ./scripts:/docker-entrypoint-initdb.d/
